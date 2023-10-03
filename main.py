@@ -97,3 +97,5 @@ while done == False :
     pygame.display.flip()
 
 pygame.quit()
+
+#copyright Real-Kami 03/10/2023
