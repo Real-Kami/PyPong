@@ -44,22 +44,19 @@ class Balle:
         if self.pos[1] < 0 or self.pos[1] > fenetre.get_height():
             self.vect[1] = -self.vect[1]
 
-        self.gameover()
-
-    def gameover(self):
         if self.pos[0] < 0:
-            sleep(3)
-            pygame.display.quit()
-            pygame.quit()
-            sys.exit()
+            init(raquettes[0].record)
+
 
     def collideCheck(self, raquette):
-        rect = pygame.Rect( raquette.pos[0], raquette.pos[1], 10, 120 )
+        rect = pygame.Rect( raquette.pos[0], raquette.pos[1], raquette.dim[0], raquette.dim[1] )
         if rect.collidepoint(self.pos[0], self.pos[1]):
             self.rebondirRaquette(raquette)
 
     def rebondirRaquette(self, raquette):
         raquette.score += 1
+        if raquette.score > raquette.record:
+           raquette.record = raquette.score
         self.vitesse += 0.1
         self.a = random() * 2 - 1
         self.vect = [cos(self.a), sin(self.a)]
@@ -71,22 +68,27 @@ class Raquette:
         self.pos = [x, 0]
         self.dim = [10, 120]
         self.score = 0
+        self.record = 0
 
     def afficher(self):
         pygame.draw.rect(fenetre, [255, 255, 255], pygame.Rect(self.pos[0], self.pos[1], self.dim[0], self.dim[1]) )
 
     def suivre(self):
         self.pos[1] = pygame.mouse.get_pos()[1]
+        if self.pos[1] + self.dim[1] > fenetre.get_height():
+            self.pos[1] = fenetre.get_height() - self.dim[1]
 
+def init(record):
+    global balle
+    global raquettes
 
+    sleep(2)
 
+    balle = Balle()
+    raquettes = [Raquette(50)]
+    raquettes[0].record = record
 
-balle = Balle()
-raquettes = [Raquette(50)]
-
-
-
-sleep(1)
+init(0)
 
 while done == False :
 
@@ -97,7 +99,7 @@ while done == False :
 
     fenetre.fill([50, 50, 70])
 
-    text_surface = my_font.render('Score : ' + str(raquettes[0].score), False, (255, 255, 255))
+    text_surface = my_font.render('Score : ' + str(raquettes[0].score) + " | Meilleur score : " + str(raquettes[0].record), False, (255, 255, 255))
     fenetre.blit(text_surface, (20,20))
 
     raquettes[0].suivre()
